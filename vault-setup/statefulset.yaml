@@ -1,0 +1,96 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: vault
+  namespace: default
+  labels:
+    app.kubernetes.io/name: vault
+    app.kubernetes.io/instance: vault
+spec:
+  serviceName: vault-internal
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: vault
+      app.kubernetes.io/instance: vault
+      component: server
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: vault
+        app.kubernetes.io/instance: vault
+        component: server
+    spec:
+      serviceAccountName: vault
+      securityContext:
+        runAsNonRoot: true
+        runAsGroup: 1000
+        runAsUser: 100
+        fsGroup: 1000
+      volumes:
+        - name: config
+          configMap:
+            name: vault-config
+        - name: home
+          emptyDir: {}
+      containers:
+        - name: vault          
+          image: vault:1.7.2
+          imagePullPolicy: IfNotPresent
+          command:
+          - "/bin/sh"
+          - "-ec"
+          args: 
+          - |
+            cp /vault/config/extraconfig-from-values.hcl /tmp/storageconfig.hcl;
+            /usr/local/bin/docker-entrypoint.sh vault server -config=/tmp/storageconfig.hcl    
+          securityContext:
+            allowPrivilegeEscalation: false
+          env:
+            - name: HOSTNAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: VAULT_ADDR
+              value: "http://127.0.0.1:8200"
+            - name: VAULT_API_ADDR
+              value: "http://$(POD_IP):8200"
+            - name: SKIP_CHOWN
+              value: "true"
+            - name: SKIP_SETCAP
+              value: "true"
+            - name: VAULT_CLUSTER_ADDR
+              value: "https://$(HOSTNAME).vault-internal:8201"
+            - name: HOME
+              value: "/home/vault"
+          volumeMounts:
+            - name: data
+              mountPath: /vault/data  
+            - name: config
+              mountPath: /vault/config
+            - name: home
+              mountPath: /home/vault
+          ports:
+            - containerPort: 8200
+              name: http
+            - containerPort: 8201
+              name: https-internal
+            - containerPort: 8202
+              name: http-rep
+          readinessProbe:
+            exec:
+              command: ["/bin/sh", "-ec", "vault status -tls-skip-verify"]
+            failureThreshold: 2
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 3
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+             storage: 1Gi
