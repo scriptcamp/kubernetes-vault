@@ -22,30 +22,31 @@ echo $VAULT_ROOT_KEY
 
 ### Unseal the vault
 
-kubectl exec vault-0 -- vault operator unseal $VAULT_UNSEAL_KEY	
+```kubectl exec vault-0 -- vault operator unseal $VAULT_UNSEAL_KEY	```
 
-Login into the vault
-kubectl exec vault-0 -- vault login $VAULT_ROOT_KEY
+### Login into the vault
+```kubectl exec vault-0 -- vault login $VAULT_ROOT_KEY```
 
-Create secrets 
+### Create secrets 
 
-vault secrets enable -version=2 -path="demo-app" kv
+```vault secrets enable -version=2 -path="demo-app" kv```
 
-#Create key-value pairs
-vault kv put demo-app/user01 name=devopscube
+### Create key-value pairs
+```vault kv put demo-app/user01 name=devopscube
 vault kv get demo-app/user01 
-
-#Create policies
-vault policy write demo-policy - <<EOH
+```
+###Create policies
+```vault policy write demo-policy - <<EOH
 path "demo-app/*" {
   capabilities = ["read"]
 }
 EOH
+```
 
-vault policy list
+### vault policy list
 
 #Enable Kubernetes authentication methods
-vault auth enable kubernetes
+```vault auth enable kubernetes
 
 vault write auth/kubernetes/config token_reviewer_jwt="$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" kubernetes_host="https://$KUBERNETES_PORT_443_TCP_ADDR:443" kubernetes_ca_cert=@/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
 
@@ -54,3 +55,4 @@ vault write auth/kubernetes/role/webapp \
         bound_service_account_namespaces=default \
         policies=demo-policy \
         ttl=72h
+        ```
