@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: vault-ui
+  namespace: default
+spec:
+  type: NodePort  
+  ports:
+    - name: ui
+      port: 8200
+      targetPort: 8200
+  selector:
+    app.kubernetes.io/name: vault
+    app.kubernetes.io/instance: vault
+    component: server
