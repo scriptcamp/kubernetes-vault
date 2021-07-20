@@ -5,10 +5,15 @@ Full Documentation: https://devopscube.com/vault-in-kubernetes/
 
 #Sample API request to the vault using service account tokens to acquire a token with reading capabilities for path "demo-app"
 
+```
 curl --request POST --data '{"jwt": "<< service account token of the pod >>", "role": "webapp"}' http://192.168.49.2:30493/v1/auth/kubernetes/login
+```
 
 #Sample API request to the vault to fetch secrets at "demo-app"
+
+```
 curl -H "X-Vault-Token: <client_token>" -H "X-Vault-Namespace: vault" -X GET http://192.168.49.2:30493/v1/demo-app/data/user01?version=1
+```
 
 ## Vault Usage
 
