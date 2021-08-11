@@ -16,7 +16,7 @@ spec:
     - name: http
       port: 8200
       targetPort: 8200
-      nodePort: 31000
+      nodePort: 32000
     - name: https-internal
       port: 8201
       targetPort: 8201
