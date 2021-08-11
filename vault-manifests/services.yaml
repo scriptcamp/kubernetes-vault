@@ -33,12 +33,9 @@ metadata:
   name: vault-internal
   namespace: default
   labels:
-    helm.sh/chart: vault-0.14.0
     app.kubernetes.io/name: vault
     app.kubernetes.io/instance: vault
-    app.kubernetes.io/managed-by: Helm
   annotations:
-
 spec:
   clusterIP: None
   publishNotReadyAddresses: true
