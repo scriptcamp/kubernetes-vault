@@ -2,19 +2,20 @@
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: vault-injector
-  labels:
-    app.kubernetes.io/name: vault-injector
-    app.kubernetes.io/instance: vault
+  name: vault-agent-injector
   namespace: default
+  labels:
+    app.kubernetes.io/name: vault-agent-injector
+    app.kubernetes.io/instance: vault
+
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: vault-injector-clusterrole
+  name: vault-agent-injector-clusterrole
   labels:
-    app.kubernetes.io/name: vault-injector
-    app.kubernetes.io/instance: vault
+    app.kubernetes.io/name: vault-agent-injector
+    app.kubernetes.io/instance: vault 
 rules:
 - apiGroups: ["admissionregistration.k8s.io"]
   resources: ["mutatingwebhookconfigurations"]
@@ -23,54 +24,21 @@ rules:
     - "list"
     - "watch"
     - "patch"
+
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: vault-injector-binding
+  name: vault-agent-injector-binding
   labels:
-    app.kubernetes.io/name: vault-injector
-    app.kubernetes.io/instance: vault
+    app.kubernetes.io/name: vault-agent-injector
+    app.kubernetes.io/instance: vault  
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: vault-injector-clusterrole
+  name: vault-agent-injector-clusterrole
 subjects:
 - kind: ServiceAccount
-  name: vault-injector
+  name: vault-agent-injector
   namespace: default
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
-metadata:
-  name: vault-injector-role
-  labels:
-    app.kubernetes.io/name: vault-injector
-    app.kubernetes.io/instance: vault
-  namespace: default
-rules:
-- apiGroups: [""]
-  resources: ["endpoints", "secrets"]
-  verbs: 
-    - "create"
-    - "get"
-    - "watch"
-    - "list"
-    - "update"
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  name: vault-injector-rolebinding
-  labels:
-    app.kubernetes.io/name: vault-injector
-    app.kubernetes.io/instance: vault
-  namespace: default
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: Role
-  name: vault-injector-role
-subjects:
-- kind: ServiceAccount
-  name: vault-injector
-  namespace: default
+
