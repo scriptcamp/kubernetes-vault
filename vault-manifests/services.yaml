@@ -1,16 +1,22 @@
 ---
+# Service for Vault Server
 apiVersion: v1
 kind: Service
 metadata:
   name: vault
   namespace: default
+  labels:
+    app.kubernetes.io/name: vault
+    app.kubernetes.io/instance: vault
+  annotations:
 spec:
   type: NodePort  
+  publishNotReadyAddresses: true
   ports:
     - name: http
       port: 8200
       targetPort: 8200
-      nodePort: 32000
+      nodePort: 31000
     - name: https-internal
       port: 8201
       targetPort: 8201
@@ -20,11 +26,19 @@ spec:
     component: server
 
 ---
+# Headless Service
 apiVersion: v1
 kind: Service
 metadata:
   name: vault-internal
   namespace: default
+  labels:
+    helm.sh/chart: vault-0.14.0
+    app.kubernetes.io/name: vault
+    app.kubernetes.io/instance: vault
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+
 spec:
   clusterIP: None
   publishNotReadyAddresses: true
@@ -39,4 +53,3 @@ spec:
     app.kubernetes.io/name: vault
     app.kubernetes.io/instance: vault
     component: server
-
