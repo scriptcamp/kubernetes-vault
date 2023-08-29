@@ -17,10 +17,10 @@ spec:
             image: vault
             ports:
               - containerPort: 8200
-              volumeMounts:
-                - name: vault-config
-                  mountPath: /vault/config
-                  readOnly: true
+            volumeMounts:
+              - name: vault-config
+                mountPath: /vault/config
+                readOnly: true
       volumes:
         - name: vault-config
           configMap:
