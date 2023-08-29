@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vault-config
+  namespace: my-namespace
+data:
+  vault-config.hcl: |
+    backend "raft" {
+      path        = "/vault/data"
+      node_id     = "<node-id>"
+      retry_join {
+        leader_api_addr = "http://vault-0.vault-internal:8200"
+      }
+    }
+    
